@@ -1,4 +1,4 @@
-var socket = io.connect("http://127.0.0.1:5000");
+var socket = io.connect();
 
 const X_CLASS = "x";
 const CIRCLE_CLASS = "circle";
@@ -46,23 +46,40 @@ socket.on("board", function (receivedBoard) {
     }
   console.log("received board");
   console.log(receivedBoard);
-  let rowValue = 0;
-  let columnValue = 0;
-  [...cellElements].forEach(function (cell) {
-    if (receivedBoard[rowValue][columnValue] != null) {
-      if (receivedBoard[rowValue][columnValue] === "X") {
-        cell.classList.add(X_CLASS);
-      } else if (receivedBoard[rowValue][columnValue] === "O") {
-        cell.classList.add(CIRCLE_CLASS);
-      }
-    }
-    rowValue++;
-    columnValue++;
-    if (columnValue == 3) {
-      columnValue = 0;
-    }
-  });
+  render(receivedBoard);
 });
+
+function render(boardToRender) {
+  for(let row = 0; row < 3; row++) {
+    for(let col = 0; col < 3; col++) {
+      cell = $(`.cell:nth-child(${row * 3 + col + 1})`)
+      // console.log(`R ${row} C ${col}`)
+    if (boardToRender[row][col] != null) {
+      if (boardToRender[row][col] === "X") {
+        cell.addClass(X_CLASS);
+      } else if (boardToRender[row][col] === "O") {
+        cell.addClass(CIRCLE_CLASS);
+      }
+      
+    }
+  }
+  }
+  // [...cellElements].forEach(function (cell) {
+  //   console.log(`R ${rowValue} C ${columnValue}`)
+  //   if (boardToRender[rowValue][columnValue] != null) {
+  //     if (boardToRender[rowValue][columnValue] === "X") {
+  //       cell.classList.add(X_CLASS);
+  //     } else if (boardToRender[rowValue][columnValue] === "O") {
+  //       cell.classList.add(CIRCLE_CLASS);
+  //     }
+  //   }
+  //   rowValue++;
+  //   columnValue++;
+  //   if (columnValue == 3) {
+  //     columnValue = 0;
+  //   }
+  // });
+}
 
 function startGame() {
   circleTurn = false;
@@ -116,7 +133,7 @@ function placeMark(cell, currentClass) {
   let cellYValue = parseInt(cell.getAttribute("data-cell-y"));
   console.log(cellYValue, cellXValue);
   socket.emit("move", [cellYValue, cellXValue]);
-  cell.classList.add(currentClass);
+  // cell.classList.add(currentClass);
 }
 
 function swapTurns() {
@@ -129,10 +146,10 @@ function setBoardHoverClass() {
   board.classList.add(circleTurn ? CIRCLE_CLASS : X_CLASS);
 }
 
-function checkWin(currentClass) {
-  return WINNING_COMBINATIONS.some((combination) => {
-    return combination.every((index) => {
-      return cellElements[index].classList.contains(currentClass);
-    });
-  });
-}
+// function checkWin(currentClass) {
+//   return WINNING_COMBINATIONS.some((combination) => {
+//     return combination.every((index) => {
+//       return cellElements[index].classList.contains(currentClass);
+//     });
+//   });
+// }
